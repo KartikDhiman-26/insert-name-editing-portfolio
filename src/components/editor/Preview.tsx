@@ -4,7 +4,7 @@ import { EditPhase } from '../../data/project';
 
 export interface PreviewProps {
   phase?: EditPhase | string;
-  previewContent?: boolean; // Wait, previewContent doesn't seem to be used except as a prop? Let's check original. It was `previewContent`. Actually, looking at original Preview: `previewContent` wasn't used inside the component directly, wait, was it? Let's assume it was unused if it is. No, wait, wait! The original had `instruction`.
+  previewContent?: boolean;
   instruction?: string;
 }
 
@@ -58,6 +58,68 @@ const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ instruction }, ref) 
     return () => ctx.revert();
   }, []);
 
+  // Render instruction lines with enhanced typography
+  const renderInstruction = () => {
+    if (!displayInstruction) return null;
+
+    const isComplete = displayInstruction.includes('COMPLETE');
+    const isPlayPrompt = displayInstruction.includes('PLAY');
+    const lines = displayInstruction.split('\n');
+
+    return (
+      <div 
+        ref={instructionRef}
+        className={`main-instruction ${isComplete ? 'final-instruction' : ''}`}
+      >
+        {/* System status prefix */}
+        <div className="instruction-prefix">
+          {isComplete ? '// EXPORT READY' : '// SYSTEM'}
+        </div>
+
+        {lines.map((line, i) => {
+          // EDIT COMPLETE — first line is huge
+          if (isComplete && i === 0) {
+            return (
+              <div key={i} className="instruction-huge instruction-red">
+                {line}
+              </div>
+            );
+          }
+
+          // CLICK PLAY TO VIEW — emphasize PLAY
+          if (isPlayPrompt && line.includes('PLAY')) {
+            const parts = line.split('PLAY');
+            return (
+              <div key={i} className="instruction-sub instruction-muted">
+                {parts[0]}<span className="play-word">PLAY</span>{parts[1]}
+              </div>
+            );
+          }
+
+          // Normal instructions
+          let colorClass = 'instruction-blue';
+          if (displayInstruction.includes('ADD TO TIMELINE') || 
+              displayInstruction.includes('FINALIZING') || 
+              displayInstruction.includes('EDITING') ||
+              displayInstruction.includes('COMPLETE')) {
+            colorClass = 'instruction-red';
+          }
+
+          return (
+            <div key={i} className={`instruction-normal ${colorClass}`}>
+              {line}
+            </div>
+          );
+        })}
+
+        {/* Technical metadata footer */}
+        <div className="instruction-meta">
+          {isComplete ? 'TIMELINE LOCKED • READY FOR REVIEW' : 'INSERT_NAME® EDITOR v1.0'}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div ref={(node) => {
       containerRef.current = node;
@@ -75,35 +137,7 @@ const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ instruction }, ref) 
                 <span className="project">PROJECT_001</span>
               </div>
               
-              {displayInstruction && (
-                <div 
-                  ref={instructionRef}
-                  className={`main-instruction ${displayInstruction.includes('COMPLETE') ? 'final-instruction' : ''}`}
-                >
-                  {displayInstruction.split('\n').map((line, i) => {
-                    let className = 'instruction-normal';
-                    let colorClass = 'instruction-blue';
-                    
-                    if (displayInstruction.includes('ADD TO TIMELINE') || 
-                        displayInstruction.includes('FINALIZING') || 
-                        displayInstruction.includes('EDITING') ||
-                        displayInstruction.includes('COMPLETE')) {
-                       colorClass = 'instruction-red';
-                    }
-
-                    if (displayInstruction.includes('COMPLETE')) {
-                      className = i === 0 ? 'instruction-huge' : 'instruction-sub';
-                      if (i === 1) colorClass = 'instruction-red';
-                    }
-                    
-                    return (
-                      <div key={i} className={`${className} ${colorClass}`}>
-                        {line}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+              {renderInstruction()}
 
               <div className="glow-orb red"></div>
               <div className="glow-orb blue"></div>
@@ -161,7 +195,7 @@ const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ instruction }, ref) 
           z-index: 10;
         }
         
-        /* TECHNICAL HEADER - moved to top left */
+        /* ── TECHNICAL HEADER ── */
         .top-technical-header {
           position: absolute;
           top: 16px;
@@ -185,7 +219,7 @@ const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ instruction }, ref) 
           animation: rec-pulse 2s infinite;
         }
         
-        /* INSTRUCTION TYPOGRAPHY - Centered */
+        /* ── INSTRUCTION TYPOGRAPHY ── */
         .main-instruction {
           position: relative;
           z-index: 20;
@@ -194,42 +228,81 @@ const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ instruction }, ref) 
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 8px;
+          gap: 6px;
+        }
+        
+        .instruction-prefix {
+          font-family: var(--font-mono, monospace);
+          font-size: 9px;
+          letter-spacing: 0.25em;
+          color: rgba(255, 255, 255, 0.2);
+          margin-bottom: 12px;
+        }
+
+        .instruction-meta {
+          font-family: var(--font-mono, monospace);
+          font-size: 8px;
+          letter-spacing: 0.2em;
+          color: rgba(255, 255, 255, 0.12);
+          margin-top: 16px;
+          border-top: 1px solid rgba(255,255,255,0.05);
+          padding-top: 10px;
         }
         
         .instruction-normal {
-          font-size: 1.4rem;
-          font-weight: 300;
-          letter-spacing: 0.3em;
+          font-size: 1.3rem;
+          font-weight: 200;
+          letter-spacing: 0.35em;
         }
         
         .instruction-huge {
-          font-size: 2.5rem;
-          font-weight: 400;
+          font-size: 2.8rem;
+          font-weight: 300;
           letter-spacing: 0.4em;
-          text-shadow: 0 0 20px rgba(206,24,24,0.4);
+          animation: instruction-breathe 3s ease-in-out infinite;
         }
         
         .instruction-sub {
-          font-size: 0.9rem;
-          font-weight: 300;
-          letter-spacing: 0.2em;
+          font-size: 0.85rem;
+          font-weight: 200;
+          letter-spacing: 0.25em;
           opacity: 0.7;
-          margin-top: 12px;
+          margin-top: 10px;
+        }
+
+        .instruction-muted {
+          color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* PLAY word emphasis */
+        .play-word {
+          color: var(--dante, #CE1818);
+          font-weight: 400;
+          letter-spacing: 0.3em;
+          text-shadow: 0 0 12px rgba(206, 24, 24, 0.5);
+          padding: 0 2px;
+          border-left: 1px solid rgba(206, 24, 24, 0.4);
+          border-right: 1px solid rgba(206, 24, 24, 0.4);
+          margin: 0 4px;
+        }
+
+        @keyframes instruction-breathe {
+          0%, 100% { text-shadow: 0 0 20px rgba(206,24,24,0.3); }
+          50% { text-shadow: 0 0 35px rgba(206,24,24,0.5); }
         }
         
         /* Deterministic state colors */
         .instruction-blue {
           color: var(--text, #f2f2f2);
-          text-shadow: 0 0 12px rgba(100,175,219,0.4);
+          text-shadow: 0 0 8px rgba(100,175,219,0.3);
         }
         
         .instruction-red {
           color: var(--dante, #CE1818);
-          text-shadow: 0 0 12px rgba(206,24,24,0.6);
+          text-shadow: 0 0 10px rgba(206,24,24,0.4);
         }
-
-        /* VOLUMETRIC SMOKE / GLOW ORBS */
+        
+        /* ── GLOW ORBS ── */
         .glow-orb {
           position: absolute;
           border-radius: 50%;

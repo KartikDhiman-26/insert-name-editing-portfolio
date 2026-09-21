@@ -176,11 +176,24 @@ const Inspector = forwardRef<HTMLDivElement, InspectorProps>(({ phase, project, 
           color: var(--text, #f2f2f2);
           background: rgba(206, 24, 24, 0.1);
           box-shadow: 0 0 16px rgba(206, 24, 24, 0.2);
+          animation: play-pulse 2.5s ease-in-out infinite;
         }
 
         .inspector-play-btn[data-state="ready"]:hover {
           background: rgba(206, 24, 24, 0.2);
-          box-shadow: 0 0 24px rgba(206, 24, 24, 0.4);
+          box-shadow: 0 0 28px rgba(206, 24, 24, 0.5);
+          animation: none;
+        }
+
+        @keyframes play-pulse {
+          0%, 100% {
+            box-shadow: 0 0 16px rgba(206, 24, 24, 0.2);
+            border-color: rgba(206, 24, 24, 0.6);
+          }
+          50% {
+            box-shadow: 0 0 28px rgba(206, 24, 24, 0.4), 0 0 4px rgba(206, 24, 24, 0.15) inset;
+            border-color: rgba(206, 24, 24, 1);
+          }
         }
       `}</style>
     </div>

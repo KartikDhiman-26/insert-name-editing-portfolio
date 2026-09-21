@@ -1,5 +1,8 @@
 import { useRef, useLayoutEffect, useState, useEffect } from 'react';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 import PortfolioHero from './portfolio/PortfolioHero';
 import PortfolioProgress from './portfolio/PortfolioProgress';
@@ -60,7 +63,19 @@ export default function PortfolioExperience(_props: PortfolioExperienceProps) {
       });
 
     }, containerRef);
-    return () => ctx.revert();
+
+    // After portfolio mounts, refresh ScrollTrigger so WorkSection's
+    // scrub-driven entrance animations register against the new DOM.
+    // The EditorExperience transition disables all ScrollTriggers globally;
+    // this ensures they're re-enabled and recalculated for Part 2.
+    const refreshTimer = setTimeout(() => {
+      ScrollTrigger.refresh(true);
+    }, 200);
+
+    return () => {
+      clearTimeout(refreshTimer);
+      ctx.revert();
+    };
   }, []);
 
   // ── Scroll tracking ──
