@@ -1,6 +1,7 @@
 import { forwardRef, useLayoutEffect, useRef, useState, useEffect } from 'react';
 import gsap from 'gsap';
 import { EditPhase } from '../../data/project';
+import RippleGrid from '../RippleGrid';
 
 export interface PreviewProps {
   phase?: EditPhase | string;
@@ -129,6 +130,23 @@ const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ instruction }, ref) 
       <div className="aspect-wrapper">
         <div className="monitor-placeholder">
           <div className="monitor-frame">
+            <div className="ripple-grid-wrapper">
+              <RippleGrid
+                enableRainbow={false}
+                gridColor="#ffffff"
+                rippleIntensity={0.02}
+                gridSize={16}
+                gridThickness={22}
+                fadeDistance={2.3}
+                vignetteStrength={5}
+                glowIntensity={0.45}
+                opacity={0.28}
+                gridRotation={0}
+                mouseInteraction
+                mouseInteractionRadius={1}
+                speed={0.35}
+              />
+            </div>
             <div className="monitor-content">
               <div className="scanlines"></div>
               <div className="top-technical-header">
@@ -184,6 +202,20 @@ const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ instruction }, ref) 
           background: #000;
           overflow: hidden;
         }
+
+        .ripple-grid-wrapper {
+          position: absolute;
+          inset: 0;
+          z-index: 0;
+          pointer-events: none;
+        }
+        
+        .ripple-grid-wrapper canvas {
+          width: 100% !important;
+          height: 100% !important;
+          pointer-events: none;
+        }
+
         .monitor-content {
           position: absolute;
           inset: 0;
@@ -229,77 +261,85 @@ const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ instruction }, ref) 
           flex-direction: column;
           align-items: center;
           gap: 6px;
+          background: rgba(5, 5, 5, 0.45);
+          border: 1px solid rgba(255, 255, 255, 0.10);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          padding: 24px 32px;
+          border-radius: 8px;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
         
         .instruction-prefix {
           font-family: var(--font-mono, monospace);
-          font-size: 9px;
+          font-size: 11px;
+          font-weight: 600;
           letter-spacing: 0.25em;
-          color: rgba(255, 255, 255, 0.2);
-          margin-bottom: 12px;
+          color: rgba(100, 175, 219, 0.8);
+          margin-bottom: 8px;
         }
 
         .instruction-meta {
           font-family: var(--font-mono, monospace);
-          font-size: 8px;
+          font-size: 9px;
+          font-weight: 500;
           letter-spacing: 0.2em;
-          color: rgba(255, 255, 255, 0.12);
-          margin-top: 16px;
-          border-top: 1px solid rgba(255,255,255,0.05);
+          color: rgba(255, 255, 255, 0.2);
+          margin-top: 12px;
+          border-top: 1px solid rgba(255,255,255,0.08);
           padding-top: 10px;
         }
         
         .instruction-normal {
-          font-size: 1.3rem;
-          font-weight: 200;
-          letter-spacing: 0.35em;
+          font-size: 1.5rem;
+          font-weight: 800;
+          letter-spacing: 0.15em;
+          line-height: 1.1;
         }
         
         .instruction-huge {
           font-size: 2.8rem;
-          font-weight: 300;
-          letter-spacing: 0.4em;
+          font-weight: 800;
+          letter-spacing: 0.1em;
+          line-height: 1.1;
           animation: instruction-breathe 3s ease-in-out infinite;
         }
         
         .instruction-sub {
-          font-size: 0.85rem;
-          font-weight: 200;
-          letter-spacing: 0.25em;
-          opacity: 0.7;
-          margin-top: 10px;
+          font-size: 1rem;
+          font-weight: 700;
+          letter-spacing: 0.15em;
+          opacity: 0.9;
+          margin-top: 6px;
         }
 
         .instruction-muted {
-          color: rgba(255, 255, 255, 0.5);
+          color: rgba(255, 255, 255, 0.6);
         }
 
         /* PLAY word emphasis */
         .play-word {
           color: var(--dante, #CE1818);
-          font-weight: 400;
-          letter-spacing: 0.3em;
-          text-shadow: 0 0 12px rgba(206, 24, 24, 0.5);
-          padding: 0 2px;
-          border-left: 1px solid rgba(206, 24, 24, 0.4);
-          border-right: 1px solid rgba(206, 24, 24, 0.4);
-          margin: 0 4px;
+          font-weight: 800;
+          letter-spacing: 0.15em;
+          text-shadow: 0 0 16px rgba(206, 24, 24, 0.5);
+          margin: 0 8px;
         }
 
         @keyframes instruction-breathe {
           0%, 100% { text-shadow: 0 0 20px rgba(206,24,24,0.3); }
-          50% { text-shadow: 0 0 35px rgba(206,24,24,0.5); }
+          50% { text-shadow: 0 0 40px rgba(206,24,24,0.6); }
         }
         
         /* Deterministic state colors */
         .instruction-blue {
-          color: var(--text, #f2f2f2);
-          text-shadow: 0 0 8px rgba(100,175,219,0.3);
+          color: var(--text, #ffffff);
+          text-shadow: 0 0 12px rgba(100,175,219,0.5);
         }
         
         .instruction-red {
-          color: var(--dante, #CE1818);
-          text-shadow: 0 0 10px rgba(206,24,24,0.4);
+          color: var(--text, #ffffff);
+          text-shadow: 0 0 16px rgba(206,24,24,0.5);
         }
         
         /* ── GLOW ORBS ── */

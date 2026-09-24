@@ -1,5 +1,5 @@
 import React from 'react';
-import DarkVeil from '../DarkVeil';
+import Beams from '../Beams';
 
 const PersistentAtmosphere: React.FC = () => {
   return (
@@ -28,32 +28,27 @@ const PersistentAtmosphere: React.FC = () => {
           pointer-events: none;
         }
 
-        /* Ensure DarkVeil container covers viewport and ignores pointers */
-        .dark-veil-wrapper {
+        /* Ensure Beams container covers viewport and ignores pointers */
+        .beams-wrapper {
           position: absolute;
           inset: 0;
           width: 100vw;
           height: 100vh;
           pointer-events: none;
         }
-        
-        .dark-veil-wrapper canvas {
-           width: 100% !important;
-           height: 100% !important;
-           pointer-events: none;
-        }
       `}</style>
       
       <div className="persistent-atmosphere">
-        <div className="dark-veil-wrapper">
-          <DarkVeil
-            hueShift={40}
-            noiseIntensity={0}
-            scanlineIntensity={0}
-            speed={0.5}
-            scanlineFrequency={0}
-            warpAmount={0}
-            resolutionScale={1}
+        <div className="beams-wrapper">
+          <Beams
+            beamWidth={2}
+            beamHeight={15}
+            beamNumber={12}
+            lightColor="#CE1818"
+            speed={2}
+            noiseIntensity={1.75}
+            scale={0.2}
+            rotation={0}
           />
         </div>
 
