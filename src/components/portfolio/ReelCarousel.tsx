@@ -39,6 +39,7 @@ function getCardStyle(offset: number) {
   return {
     x: clamped * 55,
     y: absOff * -18,
+    z: absOff === 0 ? 20 : absOff === 1 ? 0 : -20, // Physically pull active card forward to fix bleed
     scale: 1 - absOff * 0.1,
     rotateY: clamped * -6,
     zIndex: 10 - absOff,
@@ -56,8 +57,12 @@ export interface ReelCarouselProps {
 export default function ReelCarousel({ projects = [] }: ReelCarouselProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
+  const [isInView, setIsInView] = useState(false);
+  
   const containerRef = useRef<HTMLDivElement | null>(null);
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const titleRef = useRef<HTMLDivElement | null>(null);
   const metaRef = useRef<HTMLDivElement | null>(null);
 
@@ -75,6 +80,7 @@ export default function ReelCarousel({ projects = [] }: ReelCarouselProps) {
         gsap.to(card, {
           x: style.x,
           y: style.y,
+          z: style.z,
           scale: style.scale,
           rotateY: style.rotateY,
           opacity: style.opacity,
@@ -87,6 +93,7 @@ export default function ReelCarousel({ projects = [] }: ReelCarouselProps) {
         gsap.set(card, {
           x: style.x,
           y: style.y,
+          z: style.z,
           scale: style.scale,
           rotateY: style.rotateY,
           opacity: style.opacity,
@@ -100,27 +107,17 @@ export default function ReelCarousel({ projects = [] }: ReelCarouselProps) {
   // Initial positioning
   useEffect(() => {
     positionCards(false);
-  }, []);
+  }, [positionCards]);
 
-  // Animate cards + title/meta on index change
+  // Intersection Observer for keyboard lock
   useEffect(() => {
-    positionCards(true);
-
-    // Animate title in
-    if (titleRef.current) {
-      gsap.fromTo(titleRef.current,
-        { y: 20, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.5, ease: 'power2.out', delay: 0.1 }
-      );
-    }
-    // Animate meta in
-    if (metaRef.current) {
-      gsap.fromTo(metaRef.current,
-        { y: 15, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.45, ease: 'power2.out', delay: 0.15 }
-      );
-    }
-  }, [activeIndex, positionCards]);
+    if (!containerRef.current) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      setIsInView(entry.isIntersecting);
+    }, { threshold: 0.3 });
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   const goTo = useCallback((newIndex: number) => {
     if (isAnimating || newIndex === activeIndex || newIndex < 0 || newIndex >= projects.length) return;
@@ -142,6 +139,68 @@ export default function ReelCarousel({ projects = [] }: ReelCarouselProps) {
     }
   }, [activeIndex, isAnimating, projects.length]);
 
+  // Keyboard navigation
+  useEffect(() => {
+    if (!isInView) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        goTo(activeIndex - 1);
+      }
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        goTo(activeIndex + 1);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isInView, activeIndex, goTo]);
+
+  // Animate cards + title/meta on index change
+  // Also handle video playback & muting logic here
+  useEffect(() => {
+    positionCards(true);
+
+    // Audio/Video logic
+    setIsMuted(true);
+    videoRefs.current.forEach((vid, i) => {
+      if (vid) {
+        vid.muted = true;
+        if (i === activeIndex) {
+          vid.play().catch(() => {}); // handle autoplay policies
+        } else {
+          vid.pause();
+          vid.currentTime = 0;
+        }
+      }
+    });
+
+    // Animate title in
+    if (titleRef.current) {
+      gsap.fromTo(titleRef.current,
+        { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.5, ease: 'power2.out', delay: 0.1 }
+      );
+    }
+    // Animate meta in
+    if (metaRef.current) {
+      gsap.fromTo(metaRef.current,
+        { y: 15, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.45, ease: 'power2.out', delay: 0.15 }
+      );
+    }
+  }, [activeIndex, positionCards]);
+
+  const handleCardClick = (index: number) => {
+    if (index === activeIndex) {
+      const vid = videoRefs.current[index];
+      if (vid) {
+        vid.muted = !vid.muted;
+        setIsMuted(vid.muted);
+      }
+    }
+  };
+
   return (
     <div ref={containerRef} className="rc-root">
 
@@ -161,18 +220,36 @@ export default function ReelCarousel({ projects = [] }: ReelCarouselProps) {
               key={proj.id}
               ref={(el) => { cardsRef.current[i] = el; }}
               className={`rc-card ${i === activeIndex ? 'rc-card-active' : ''}`}
+              onClick={() => handleCardClick(i)}
             >
               <div className="rc-card-inner">
                 <div className="rc-card-reflection" />
-                {/* Colored texture placeholder */}
                 <div
                   className="rc-card-texture"
                   style={{ background: (TEXTURES as any)[proj.id] || TEXTURES['005'] }}
                 >
+                  {proj.videoUrl && (
+                    <video
+                      ref={(el) => { videoRefs.current[i] = el; }}
+                      src={proj.videoUrl}
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      preload={i === activeIndex ? "auto" : "none"}
+                      className="rc-card-video"
+                    />
+                  )}
                   {/* Scanline overlay */}
                   <div className="rc-card-scanlines" />
                   {/* Noise grain overlay */}
                   <div className="rc-card-grain" />
+                  {/* Audio visual feedback indicator */}
+                  {i === activeIndex && proj.videoUrl && (
+                    <div className="rc-audio-indicator">
+                      {isMuted ? 'MUTED' : 'SOUND ON'}
+                    </div>
+                  )}
                   {/* Project ID watermark */}
                   <div className="rc-card-watermark">{proj.id}</div>
                 </div>
@@ -320,6 +397,38 @@ export default function ReelCarousel({ projects = [] }: ReelCarouselProps) {
           height: 100%;
           position: relative;
           z-index: 2;
+        }
+        .rc-card-video {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          background-color: #000;
+          z-index: 0;
+        }
+        
+        .rc-audio-indicator {
+          position: absolute;
+          top: 16px;
+          right: 16px;
+          background: rgba(0, 0, 0, 0.6);
+          backdrop-filter: blur(4px);
+          -webkit-backdrop-filter: blur(4px);
+          padding: 4px 8px;
+          border-radius: 4px;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          font-family: var(--font-mono);
+          font-size: 8px;
+          letter-spacing: 0.15em;
+          color: rgba(255, 255, 255, 0.8);
+          z-index: 10;
+          pointer-events: none;
+        }
+        
+        .rc-card-active .rc-card-inner {
+          background: #000;
+          opacity: 1 !important;
         }
         .rc-card-scanlines {
           position: absolute;
