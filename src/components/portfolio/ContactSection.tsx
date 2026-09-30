@@ -12,11 +12,6 @@ const ContactSection = forwardRef<HTMLElement, ContactSectionProps>((props, ref)
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      const header = document.querySelector('.contact-header');
-      const titleSpans = document.querySelectorAll('.contact-title span');
-      const finalThought = document.querySelector('.contact-final');
-      const links = document.querySelectorAll('.contact-link');
-
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: containerRef.current,
@@ -26,22 +21,22 @@ const ContactSection = forwardRef<HTMLElement, ContactSectionProps>((props, ref)
         }
       });
 
-      tl.fromTo(header,
+      tl.fromTo('.contact-header',
         { opacity: 0, y: 20 },
         { opacity: 1, y: 0, ease: 'none' }, 0
       );
 
-      tl.fromTo(titleSpans,
+      tl.fromTo('.contact-title span',
         { opacity: 0, y: 40, filter: 'blur(10px)', scale: 0.95 },
         { opacity: 1, y: 0, filter: 'blur(0px)', scale: 1, stagger: 0.1, ease: 'none' }, 0
       );
       
-      tl.fromTo(finalThought,
+      tl.fromTo('.contact-final',
         { opacity: 0, y: 20 },
         { opacity: 1, y: 0, ease: 'none' }, 0.2
       );
 
-      tl.fromTo(links,
+      tl.fromTo('.contact-link',
         { opacity: 0, x: -20 },
         { opacity: 1, x: 0, stagger: 0.1, ease: 'none' }, 0.2
       );

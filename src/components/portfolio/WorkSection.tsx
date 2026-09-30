@@ -15,13 +15,8 @@ const WorkSection = forwardRef<HTMLElement, WorkSectionProps>(( { projects = [] 
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      const header = document.querySelector('.work-header');
-      const rcStage = document.querySelector('.rc-stage');
-      const titleArea = document.querySelector('.rc-title-area');
-      const metaArea = document.querySelector('.rc-meta-area');
-
       // Scroll-scrubbed entrance
-      gsap.fromTo(header, 
+      gsap.fromTo('.work-header', 
         { opacity: 0, y: 40 },
         { 
           opacity: 1, y: 0,
@@ -35,7 +30,7 @@ const WorkSection = forwardRef<HTMLElement, WorkSectionProps>(( { projects = [] 
         }
       );
 
-      gsap.fromTo(rcStage,
+      gsap.fromTo('.rc-stage',
         { scale: 0.85, opacity: 0, y: 100 },
         {
           scale: 1, opacity: 1, y: 0,
@@ -49,8 +44,8 @@ const WorkSection = forwardRef<HTMLElement, WorkSectionProps>(( { projects = [] 
         }
       );
 
-      gsap.fromTo([titleArea, metaArea],
-        { opacity: 0, x: (i) => i === 0 ? -40 : 40, filter: 'blur(8px)' },
+      gsap.fromTo(['.rc-title-area', '.rc-meta-area'],
+        { opacity: 0, x: -40, filter: 'blur(8px)' },
         {
           opacity: 1, x: 0, filter: 'blur(0px)',
           ease: 'none',
@@ -62,7 +57,6 @@ const WorkSection = forwardRef<HTMLElement, WorkSectionProps>(( { projects = [] 
           }
         }
       );
-
     }, containerRef);
     return () => ctx.revert();
   }, []);

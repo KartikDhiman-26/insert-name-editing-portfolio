@@ -15,12 +15,8 @@ const LongFormSection = forwardRef<HTMLElement, LongFormSectionProps>(( { projec
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      const header = document.querySelector('.lf-header');
-      const mediaWrapper = document.querySelector('.media-wrapper');
-      const infoSection = document.querySelector('.shared-info-section');
-
       // Scroll-scrubbed entrance
-      gsap.fromTo(header, 
+      gsap.fromTo('.lf-header', 
         { opacity: 0, y: 40, clipPath: 'polygon(0 0, 100% 0, 100% 0%, 0% 0%)' },
         { 
           opacity: 1, y: 0, clipPath: 'polygon(0 -20%, 100% -20%, 100% 120%, 0% 120%)',
@@ -34,7 +30,7 @@ const LongFormSection = forwardRef<HTMLElement, LongFormSectionProps>(( { projec
         }
       );
 
-      gsap.fromTo(mediaWrapper,
+      gsap.fromTo('.media-wrapper',
         { scale: 0.9, opacity: 0, y: 100, rotationX: 10 },
         {
           scale: 1, opacity: 1, y: 0, rotationX: 0,
@@ -48,7 +44,7 @@ const LongFormSection = forwardRef<HTMLElement, LongFormSectionProps>(( { projec
         }
       );
 
-      gsap.fromTo(infoSection,
+      gsap.fromTo('.shared-info-section',
         { opacity: 0, y: 60, filter: 'blur(8px)' },
         {
           opacity: 1, y: 0, filter: 'blur(0px)',
@@ -61,7 +57,6 @@ const LongFormSection = forwardRef<HTMLElement, LongFormSectionProps>(( { projec
           }
         }
       );
-
     }, containerRef);
     return () => ctx.revert();
   }, []);

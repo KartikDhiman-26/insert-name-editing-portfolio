@@ -12,15 +12,7 @@ const AboutSection = forwardRef<HTMLElement, AboutSectionProps>((props, ref) => 
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      const header = document.querySelector('.about-header');
-      const title = document.querySelector('.about-title');
-      const strip = document.querySelector('.about-strip');
-      const body = document.querySelector('.about-body');
-      const footer = document.querySelector('.about-footer');
-
-      const els = [header, title, strip, body, footer].filter(Boolean);
-
-      gsap.fromTo(els,
+      gsap.fromTo(['.about-header', '.about-title', '.about-strip', '.about-body', '.about-footer'],
         { opacity: 0, y: 40, filter: 'blur(8px)', clipPath: 'polygon(0 0, 100% 0, 100% 0%, 0% 0%)' },
         {
           opacity: 1, y: 0, filter: 'blur(0px)', clipPath: 'polygon(0 -20%, 100% -20%, 100% 120%, 0% 120%)',

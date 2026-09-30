@@ -211,8 +211,12 @@ export default function EditorExperience({ onTransitionStart, isTransitioning, o
   useLayoutEffect(() => {
     if (!isTransitioning) return;
     
-    // Disable all scroll triggers so it doesn't rewind when window scrolls to 0
-    ScrollTrigger.getAll().forEach(st => st.disable());
+    // Disable ONLY the scroll triggers belonging to the Editor so it doesn't rewind when window scrolls to 0
+    ScrollTrigger.getAll().forEach(st => {
+      if (scrollContainerRef.current && st.trigger && (st.trigger === scrollContainerRef.current || scrollContainerRef.current.contains(st.trigger))) {
+        st.disable();
+      }
+    });
 
     const shell = editorShellRef.current;
     if (!shell) {
@@ -263,8 +267,14 @@ export default function EditorExperience({ onTransitionStart, isTransitioning, o
 
   const handlePlayClick = () => {
     if (isTransitioning) return; // Lock the transition
-    // Disable all scroll triggers IMMEDIATELY on click
-    ScrollTrigger.getAll().forEach(st => st.disable());
+    
+    // Disable ONLY the scroll triggers belonging to the Editor
+    ScrollTrigger.getAll().forEach(st => {
+      if (scrollContainerRef.current && st.trigger && (st.trigger === scrollContainerRef.current || scrollContainerRef.current.contains(st.trigger))) {
+        st.disable();
+      }
+    });
+    
     if (onTransitionStart) onTransitionStart();
   };
 
