@@ -71,20 +71,23 @@ const ContactSection = forwardRef<HTMLElement, ContactSectionProps>((props, ref)
         </div>
 
         <div className="contact-links">
-          <a href="#" className="contact-link">
-            <span className="link-label">EMAIL</span>
-            <span className="link-arrow">↗</span>
-          </a>
-          <a href="#" className="contact-link">
+          <a href="https://instagram.com/thandithandicoffeeee" target="_blank" rel="noopener noreferrer" className="contact-link">
             <span className="link-label">INSTAGRAM</span>
             <span className="link-arrow">↗</span>
           </a>
-          <a href="#" className="contact-link">
+          <a href="https://linkedin.com/in/kartik-dhiman" target="_blank" rel="noopener noreferrer" className="contact-link">
             <span className="link-label">LINKEDIN</span>
             <span className="link-arrow">↗</span>
           </a>
-          <a href="#" className="contact-link">
+          <a href="https://github.com/KartikDhiman-26" target="_blank" rel="noopener noreferrer" className="contact-link">
             <span className="link-label">GITHUB</span>
+            <span className="link-arrow">↗</span>
+          </a>
+          <a href="mailto:kartikdhiman80@gmail.com" className="contact-link">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <span className="link-label">EMAIL</span>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '9px', color: 'var(--muted)', textTransform: 'lowercase', letterSpacing: '0.05em' }}>kartikdhiman80@gmail.com</span>
+            </div>
             <span className="link-arrow">↗</span>
           </a>
         </div>

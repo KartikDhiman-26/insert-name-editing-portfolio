@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import gsap from 'gsap';
 import { LongFormWork } from '../../data/portfolio';
 
@@ -10,25 +10,11 @@ export default function LongFormReel({ projects = [] }: LongFormReelProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [infoIndex, setInfoIndex] = useState(0); // Track info separately to update mid-transition
   const [isAnimating, setIsAnimating] = useState(false);
+  const [isInView, setIsInView] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
-  const handleNext = () => {
-    if (isAnimating || projects.length <= 1) return;
-    setIsAnimating(true);
-    
-    const nextIndex = (activeIndex + 1) % projects.length;
-    animateTransition(activeIndex, nextIndex, 1);
-  };
-
-  const handlePrev = () => {
-    if (isAnimating || projects.length <= 1) return;
-    setIsAnimating(true);
-    
-    const prevIndex = (activeIndex - 1 + projects.length) % projects.length;
-    animateTransition(activeIndex, prevIndex, -1);
-  };
-
-  const animateTransition = (fromIndex: number, toIndex: number, direction: number) => {
+  const animateTransition = useCallback((fromIndex: number, toIndex: number, direction: number) => {
     const ctx = gsap.context(() => {
       const currentReel = document.querySelector(`.reel-item-${fromIndex} .cinema-strip`);
       const nextReel = document.querySelector(`.reel-item-${toIndex} .cinema-strip`);
@@ -96,7 +82,66 @@ export default function LongFormReel({ projects = [] }: LongFormReelProps) {
     }, containerRef);
 
     return () => ctx.revert();
-  };
+  }, [containerRef]);
+
+  const handleNext = useCallback(() => {
+    if (isAnimating || projects.length <= 1) return;
+    setIsAnimating(true);
+    
+    const nextIndex = (activeIndex + 1) % projects.length;
+    animateTransition(activeIndex, nextIndex, 1);
+  }, [activeIndex, isAnimating, projects.length, animateTransition]);
+
+  const handlePrev = useCallback(() => {
+    if (isAnimating || projects.length <= 1) return;
+    setIsAnimating(true);
+    
+    const prevIndex = (activeIndex - 1 + projects.length) % projects.length;
+    animateTransition(activeIndex, prevIndex, -1);
+  }, [activeIndex, isAnimating, projects.length, animateTransition]);
+
+  // Intersection Observer for keyboard lock
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      setIsInView(entry.isIntersecting);
+    }, { threshold: 0.3 });
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  // Keyboard navigation
+  useEffect(() => {
+    if (!isInView) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        handlePrev();
+      }
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        handleNext();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isInView, handleNext, handlePrev]);
+
+  // Audio/Video logic
+  useEffect(() => {
+    videoRefs.current.forEach((vid, i) => {
+      if (vid) {
+        if (i === activeIndex) {
+          vid.play().catch(() => {});
+        } else {
+          vid.pause();
+          vid.currentTime = 0;
+        }
+      }
+    });
+  }, [activeIndex]);
+
+
 
   if (!projects || projects.length === 0) {
     return <div style={{ color: 'var(--muted)', textAlign: 'center', padding: '4rem' }}>No projects available.</div>;
@@ -464,6 +509,7 @@ export default function LongFormReel({ projects = [] }: LongFormReelProps) {
                 <div className="video-container" style={{ position: 'relative', zIndex: 2 }}>
                   {project.videoUrl ? (
                     <video 
+                      ref={(el) => { videoRefs.current[index] = el; }}
                       className="video-element"
                       src={project.videoUrl}
                       autoPlay

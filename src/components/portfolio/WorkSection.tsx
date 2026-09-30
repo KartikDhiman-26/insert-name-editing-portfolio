@@ -22,9 +22,9 @@ const WorkSection = forwardRef<HTMLElement, WorkSectionProps>(( { projects = [] 
 
       // Scroll-scrubbed entrance
       gsap.fromTo(header, 
-        { opacity: 0, y: 40, clipPath: 'polygon(0 0, 100% 0, 100% 0%, 0% 0%)' },
+        { opacity: 0, y: 40 },
         { 
-          opacity: 1, y: 0, clipPath: 'polygon(0 -20%, 100% -20%, 100% 120%, 0% 120%)',
+          opacity: 1, y: 0,
           ease: 'none',
           scrollTrigger: {
             trigger: containerRef.current,
