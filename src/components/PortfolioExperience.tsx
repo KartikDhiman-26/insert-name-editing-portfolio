@@ -13,9 +13,9 @@ import ContactSection from './portfolio/ContactSection';
 
 import { SHORT_FORM_WORK, LONG_FORM_WORK } from '../data/portfolio';
 
-export interface PortfolioExperienceProps {}
+export interface PortfolioExperienceProps { isDirectEntry?: boolean; }
 
-export default function PortfolioExperience(_props: PortfolioExperienceProps) {
+export default function PortfolioExperience({ isDirectEntry = false }: PortfolioExperienceProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const heroRef = useRef<HTMLDivElement | null>(null);
   const workRef = useRef<HTMLElement | null>(null);
@@ -59,7 +59,7 @@ export default function PortfolioExperience(_props: PortfolioExperienceProps) {
         duration: 1.4,
         stagger: 0.15,
         ease: 'power3.out',
-        delay: 1.2
+        delay: isDirectEntry ? 0.2 : 1.2
       });
 
     }, containerRef);
@@ -130,6 +130,7 @@ export default function PortfolioExperience(_props: PortfolioExperienceProps) {
         .portfolio-experience {
           width: 100%;
           min-height: 100vh;
+          min-height: 100dvh;
           /* Remove solid background so persistent atmosphere shows through */
           background: transparent; 
           color: var(--text);

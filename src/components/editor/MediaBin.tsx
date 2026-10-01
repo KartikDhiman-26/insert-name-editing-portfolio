@@ -132,6 +132,33 @@ const MediaBin = forwardRef<HTMLDivElement, MediaBinProps>(({ clips = [], onClip
           padding: 1px 4px;
           border-radius: 2px;
         }
+
+        @media (max-width: 768px) {
+          .media-bin {
+            padding: 8px 12px;
+            overflow-y: hidden;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            border-right: none;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+          }
+          .header {
+            margin-bottom: 8px;
+          }
+          .grid {
+            display: flex;
+            flex-direction: row;
+            overflow-x: auto;
+            gap: 12px;
+            padding-bottom: 8px;
+            -webkit-overflow-scrolling: touch;
+          }
+          .clip-item {
+            width: 120px;
+            flex-shrink: 0;
+          }
+        }
       `}</style>
     </div>
   );

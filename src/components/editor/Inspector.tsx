@@ -195,6 +195,26 @@ const Inspector = forwardRef<HTMLDivElement, InspectorProps>(({ phase, project, 
             border-color: rgba(206, 24, 24, 1);
           }
         }
+        
+        @media (max-width: 768px) {
+          .inspector {
+            padding: 12px 24px;
+            justify-content: center;
+            border-left: none;
+          }
+          .header, .section {
+            display: none;
+          }
+          .inspector-footer {
+            margin-top: 0;
+            padding-top: 0;
+            width: 100%;
+          }
+          .inspector-play-btn {
+            padding: 12px;
+            font-size: 16px;
+          }
+        }
       `}</style>
     </div>
   );

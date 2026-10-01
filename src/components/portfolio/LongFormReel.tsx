@@ -253,12 +253,17 @@ export default function LongFormReel({ projects = [] }: LongFormReelProps) {
         @media (max-width: 768px) {
           .media-wrapper {
             flex-direction: column;
+            width: 100%;
+            max-width: 100%;
           }
           .nav-btn-side {
             padding: 0.5rem;
           }
           .reels-container {
-            height: 300px; /* Scale down for mobile */
+            height: auto;
+            aspect-ratio: 16 / 9;
+            width: 100%;
+            max-width: 100%;
           }
         }
 

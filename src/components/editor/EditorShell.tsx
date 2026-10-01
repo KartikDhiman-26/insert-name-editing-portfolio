@@ -50,6 +50,7 @@ const EditorShell = forwardRef<HTMLDivElement, EditorShellProps>(({ phase, clips
         .editor-shell {
           width: 100vw;
           height: 100vh;
+          height: 100dvh;
           background: transparent;
           position: relative;
           overflow: hidden;
@@ -92,15 +93,17 @@ const EditorShell = forwardRef<HTMLDivElement, EditorShellProps>(({ phase, clips
 
         @media (max-width: 768px) {
           .editor-shell {
+            height: 100vh;
+          height: 100dvh;
             grid-template-columns: 1fr;
-            grid-template-rows: 40px 1fr 120px 44px;
+            grid-template-rows: 40px 120px 1fr 80px 100px 44px;
           }
-          .panel-media, .panel-inspector {
-            display: none;
-          }
-          .panel-preview {
-            grid-column: 1;
-          }
+          .panel-topbar { grid-column: 1; grid-row: 1; }
+          .panel-media { grid-column: 1; grid-row: 2; display: block; }
+          .panel-preview { grid-column: 1; grid-row: 3; }
+          .panel-inspector { grid-column: 1; grid-row: 4; display: block; border-top: 1px solid rgba(255,255,255,0.08); padding: 8px; }
+          .panel-timeline { grid-column: 1; grid-row: 5; }
+          .panel-toolbar { grid-column: 1; grid-row: 6; }
         }
       `}</style>
     </div>

@@ -91,6 +91,7 @@ const ContactSection = forwardRef<HTMLElement, ContactSectionProps>((props, ref)
       <style>{`
         .contact-section {
           min-height: 100vh;
+          min-height: 100dvh;
           width: 100%;
           display: flex;
           align-items: center;
@@ -117,7 +118,7 @@ const ContactSection = forwardRef<HTMLElement, ContactSectionProps>((props, ref)
         }
         .contact-title {
           font-family: var(--font-sans);
-          font-size: clamp(40px, 7vw, 84px);
+          font-size: clamp(32px, 10vw, 84px);
           font-weight: 300;
           letter-spacing: 0.05em;
           color: var(--text);

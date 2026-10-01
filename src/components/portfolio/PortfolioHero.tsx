@@ -8,6 +8,7 @@ const PortfolioHero = forwardRef<HTMLDivElement, PortfolioHeroProps>((_props, re
       <style>{`
         .hero-container {
           min-height: 100vh;
+          min-height: 100dvh;
           width: 100%;
           display: flex;
           align-items: center;
@@ -116,7 +117,7 @@ const PortfolioHero = forwardRef<HTMLDivElement, PortfolioHeroProps>((_props, re
 
         .hero-name {
           font-family: var(--font-sans);
-          font-size: clamp(52px, 9vw, 110px);
+          font-size: clamp(36px, 11vw, 110px);
           font-weight: 300;
           letter-spacing: 0.12em;
           color: var(--text);
