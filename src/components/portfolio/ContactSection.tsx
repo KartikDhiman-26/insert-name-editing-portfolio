@@ -62,7 +62,10 @@ const ContactSection = forwardRef<HTMLElement, ContactSectionProps>((props, ref)
         </h2>
         
         <div className="contact-final" style={{ marginBottom: '40px', textAlign: 'center', fontFamily: 'var(--font-mono)', fontSize: '12px', letterSpacing: '0.2em', color: 'var(--vergil)' }}>
-          GOT AN IDEA? <span style={{ color: 'var(--text)' }}>insert_name</span>
+          GOT AN IDEA?{' '}
+          <a href="https://insertname.in/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text)', textDecoration: 'none', borderBottom: '1px solid rgba(255,255,255,0.15)', transition: 'border-color 0.3s ease, color 0.3s ease' }}>
+            insert_name ↗
+          </a>
         </div>
 
         <div className="contact-links">

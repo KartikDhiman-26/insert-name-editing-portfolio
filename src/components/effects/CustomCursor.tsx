@@ -117,10 +117,10 @@ const CustomCursor = forwardRef<HTMLDivElement, CustomCursorProps>(({ mode = 'ch
         }
         .viewfinder {
           position: absolute;
-          left: -16px;
-          top: -16px;
-          width: 32px;
-          height: 32px;
+          left: -12px;
+          top: -12px;
+          width: 24px;
+          height: 24px;
           transform-origin: center center;
           will-change: transform, opacity;
         }
@@ -128,8 +128,8 @@ const CustomCursor = forwardRef<HTMLDivElement, CustomCursorProps>(({ mode = 'ch
         /* ── Corner Brackets ── */
         .vf-corner {
           position: absolute;
-          width: 8px;
-          height: 8px;
+          width: 6px;
+          height: 6px;
           border-color: rgba(255, 255, 255, 0.75);
           border-style: solid;
           border-width: 0;
@@ -173,7 +173,7 @@ const CustomCursor = forwardRef<HTMLDivElement, CustomCursorProps>(({ mode = 'ch
           left: 50%;
           transform: translate(-50%, -50%);
           font-family: var(--font-sans, sans-serif);
-          font-size: 14px;
+          font-size: 11px;
           font-weight: 200;
           line-height: 1;
           color: rgba(255, 255, 255, 0.9);

@@ -28,6 +28,7 @@ export default function EditorExperience({ onTransitionStart, isTransitioning, o
   const [clips, setClips] = useState<Clip[]>(CLIPS);
   const [cursorState, setCursorState] = useState<string>('default'); // 'default', 'hover', 'reject'
   const [instruction, setInstruction] = useState<string>('SELECT THE CLIPS');
+  const [isPlayReady, setIsPlayReady] = useState<boolean>(false);
 
   const handleClipClick = (clipId: string) => {
     setClips((prevClips: Clip[]) => {
@@ -193,13 +194,10 @@ export default function EditorExperience({ onTransitionStart, isTransitioning, o
       master.add(finishTl);
 
       // READY
-      const inspectorPlayBtn = document.querySelector('.inspector-play-btn');
       const readyTl = gsap.timeline();
       readyTl.to({}, { duration: 0.5 }); // brief pause
       readyTl.call(() => {
-        if (inspectorPlayBtn) {
-          inspectorPlayBtn.setAttribute('data-state', 'ready');
-        }
+        setIsPlayReady(true);
       });
       // We DO NOT add revealTl here. It is triggered by the manual PLAY button click.
     }, scrollContainerRef);
@@ -301,6 +299,7 @@ export default function EditorExperience({ onTransitionStart, isTransitioning, o
         onClipLeave={handleClipLeave}
         onPlayClick={handlePlayClick}
         instruction={instruction}
+        isPlayReady={isPlayReady}
       />
 
           {/* Scroll Indicator */}

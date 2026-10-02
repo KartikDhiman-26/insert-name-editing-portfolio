@@ -34,6 +34,7 @@ const PortfolioHero = forwardRef<HTMLDivElement, PortfolioHeroProps>((_props, re
             inset 0 0 0 1px rgba(255, 255, 255, 0.05),
             0 0 0 1px rgba(255, 255, 255, 0.12),
             0 8px 32px rgba(0, 0, 0, 0.6);
+          overflow: hidden;
         }
 
         .cinema-frame::before,
@@ -123,6 +124,8 @@ const PortfolioHero = forwardRef<HTMLDivElement, PortfolioHeroProps>((_props, re
           color: var(--text);
           line-height: 1.1;
           text-transform: uppercase;
+          overflow-wrap: break-word;
+          word-break: break-word;
         }
 
         .red-plate {
@@ -155,24 +158,21 @@ const PortfolioHero = forwardRef<HTMLDivElement, PortfolioHeroProps>((_props, re
           text-transform: uppercase;
         }
 
-        .hero-meta {
-          position: absolute;
-          bottom: 30px;
-          right: 40px;
-          font-family: var(--font-mono);
-          font-size: 9px;
-          color: var(--muted);
-          letter-spacing: 0.1em;
-          text-transform: uppercase;
-        }
-
         @media (max-width: 768px) {
           .cinema-frame {
             padding: 60px 20px;
           }
+          .hero-name {
+            letter-spacing: 0.06em;
+          }
+          .hero-top-row {
+            margin-bottom: 24px;
+          }
+          .hero-separator {
+            margin: 24px 0;
+          }
           .hero-label { left: 20px; top: 20px; }
           .hero-archive-tag { right: 20px; top: 20px; }
-          .hero-meta { right: 20px; bottom: 20px; }
           .hero-roles {
             gap: 12px;
             flex-direction: column;
@@ -207,7 +207,6 @@ const PortfolioHero = forwardRef<HTMLDivElement, PortfolioHeroProps>((_props, re
             <span className="hero-role">CREATIVE DEVELOPER</span>
           </div>
           
-          <div className="hero-meta">VIDEO / MOTION / DIGITAL</div>
         </div>
       </div>
     </div>

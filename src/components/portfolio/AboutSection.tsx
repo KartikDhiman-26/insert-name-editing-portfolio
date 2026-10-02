@@ -85,6 +85,7 @@ const AboutSection = forwardRef<HTMLElement, AboutSectionProps>((props, ref) => 
           flex-direction: column;
           align-items: center;
           text-align: center;
+          overflow: hidden;
         }
         .about-header {
           width: 100%;
@@ -136,11 +137,12 @@ const AboutSection = forwardRef<HTMLElement, AboutSectionProps>((props, ref) => 
         }
         .about-body {
           max-width: 480px;
+          margin: 0 auto 48px auto;
+          text-align: center;
           font-family: var(--font-sans);
           font-size: 13px;
           line-height: 1.6;
           color: var(--muted);
-          margin-bottom: 48px;
         }
         .about-footer {
           width: 100%;
@@ -155,13 +157,30 @@ const AboutSection = forwardRef<HTMLElement, AboutSectionProps>((props, ref) => 
         }
 
         @media (max-width: 640px) {
+          .about-section {
+            padding: 80px 16px;
+          }
           .about-glass {
             padding: 40px 24px;
           }
           .about-strip {
             flex-wrap: wrap;
             justify-content: center;
-            padding: 16px;
+            gap: 8px;
+            padding: 12px 16px;
+          }
+          .strip-item {
+            font-size: 10px;
+            letter-spacing: 0.1em;
+          }
+          .about-title {
+            font-size: clamp(20px, 5vw, 42px);
+            margin-bottom: 24px;
+          }
+          .about-body {
+            font-size: 12px;
+            margin: 0 auto 32px auto;
+            text-align: center;
           }
         }
       `}</style>

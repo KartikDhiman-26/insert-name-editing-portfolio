@@ -1,15 +1,17 @@
-import { forwardRef, useLayoutEffect, useRef, useState, useEffect } from 'react';
+import { forwardRef, useLayoutEffect, useRef, useState, useEffect, MouseEvent } from 'react';
 import gsap from 'gsap';
 import { EditPhase } from '../../data/project';
-import RippleGrid from '../RippleGrid';
+import Balatro from '../Balatro';
 
 export interface PreviewProps {
   phase?: EditPhase | string;
   previewContent?: boolean;
   instruction?: string;
+  onPlayClick?: (e: MouseEvent<HTMLButtonElement>) => void;
+  isPlayReady?: boolean;
 }
 
-const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ instruction }, ref) => {
+const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ instruction, onPlayClick, isPlayReady = false }, ref) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const instructionRef = useRef<HTMLDivElement | null>(null);
   const [displayInstruction, setDisplayInstruction] = useState<string | undefined>(instruction);
@@ -26,7 +28,7 @@ const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ instruction }, ref) 
           onComplete: () => {
             setDisplayInstruction(instruction);
             gsap.fromTo(instructionRef.current, 
-              { opacity: 0, y: 10, filter: 'blur(8px)', scale: instruction && instruction.includes('COMPLETE') ? 1.05 : 1 },
+              { opacity: 0, y: 10, filter: 'blur(8px)', scale: instruction && instruction.includes('COMPLETE') ? 1.02 : 1 },
               { opacity: 1, y: 0, filter: 'blur(0px)', scale: 1, duration: 0.6, ease: 'power3.out' }
             );
           }
@@ -37,89 +39,19 @@ const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ instruction }, ref) 
     }
   }, [instruction, displayInstruction]);
 
-  useLayoutEffect(() => {
-    const ctx = gsap.context(() => {
-      const orbs = document.querySelectorAll('.glow-orb');
-      
-      orbs.forEach((orb) => {
-        const move = () => {
-          gsap.to(orb, {
-            x: () => (Math.random() - 0.5) * 120,
-            y: () => (Math.random() - 0.5) * 120,
-            scale: () => 1 + Math.random() * 0.5,
-            opacity: () => 0.1 + Math.random() * 0.15,
-            duration: () => 3 + Math.random() * 4,
-            ease: 'sine.inOut',
-            onComplete: move
-          });
-        };
-        move();
-      });
-    }, containerRef);
-    return () => ctx.revert();
-  }, []);
-
-  // Render instruction lines with enhanced typography
-  const renderInstruction = () => {
-    if (!displayInstruction) return null;
-
-    const isComplete = displayInstruction.includes('COMPLETE');
-    const isPlayPrompt = displayInstruction.includes('PLAY');
-    const lines = displayInstruction.split('\n');
-
-    return (
-      <div 
-        ref={instructionRef}
-        className={`main-instruction ${isComplete ? 'final-instruction' : ''}`}
-      >
-        {/* System status prefix */}
-        <div className="instruction-prefix">
-          {isComplete ? '// EXPORT READY' : '// SYSTEM'}
-        </div>
-
-        {lines.map((line, i) => {
-          // EDIT COMPLETE — first line is huge
-          if (isComplete && i === 0) {
-            return (
-              <div key={i} className="instruction-huge instruction-red">
-                {line}
-              </div>
-            );
-          }
-
-          // CLICK PLAY TO VIEW — emphasize PLAY
-          if (isPlayPrompt && line.includes('PLAY')) {
-            const parts = line.split('PLAY');
-            return (
-              <div key={i} className="instruction-sub instruction-muted">
-                {parts[0]}<span className="play-word">PLAY</span>{parts[1]}
-              </div>
-            );
-          }
-
-          // Normal instructions
-          let colorClass = 'instruction-blue';
-          if (displayInstruction.includes('ADD TO TIMELINE') || 
-              displayInstruction.includes('FINALIZING') || 
-              displayInstruction.includes('EDITING') ||
-              displayInstruction.includes('COMPLETE')) {
-            colorClass = 'instruction-red';
-          }
-
-          return (
-            <div key={i} className={`instruction-normal ${colorClass}`}>
-              {line}
-            </div>
-          );
-        })}
-
-        {/* Technical metadata footer */}
-        <div className="instruction-meta">
-          {isComplete ? 'TIMELINE LOCKED • READY FOR REVIEW' : 'INSERT_NAME® EDITOR v1.0'}
-        </div>
-      </div>
-    );
+  // Derive step info from instruction
+  const getStepInfo = () => {
+    if (!displayInstruction) return { step: '01', title: 'SELECT THE CLIPS', subtitle: 'Choose the clips you want to keep.' };
+    if (displayInstruction.includes('SELECT')) return { step: '01', title: 'SELECT THE CLIPS', subtitle: 'Choose the clips you want to keep.' };
+    if (displayInstruction.includes('ADD TO TIMELINE')) return { step: '02', title: 'ADD TO TIMELINE', subtitle: 'Scroll down to build your edit.' };
+    if (displayInstruction.includes('SCROLL TO CONTINUE')) return { step: '02', title: 'SCROLL TO CONTINUE', subtitle: 'Scroll to assemble the timeline.' };
+    if (displayInstruction.includes('FINALIZING')) return { step: '03', title: 'FINALIZING EDIT', subtitle: 'Arranging clips on the timeline.' };
+    if (displayInstruction.includes('COMPLETE')) return { step: '04', title: 'EDIT COMPLETE', subtitle: 'YOUR EDIT IS READY' };
+    return { step: '01', title: displayInstruction, subtitle: '' };
   };
+
+  const stepInfo = getStepInfo();
+  const isComplete = displayInstruction?.includes('COMPLETE') || false;
 
   return (
     <div ref={(node) => {
@@ -130,23 +62,21 @@ const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ instruction }, ref) 
       <div className="aspect-wrapper">
         <div className="monitor-placeholder">
           <div className="monitor-frame">
-            <div className="ripple-grid-wrapper">
-              <RippleGrid
-                enableRainbow={false}
-                gridColor="#ffffff"
-                rippleIntensity={0.02}
-                gridSize={16}
-                gridThickness={22}
-                fadeDistance={2.3}
-                vignetteStrength={5}
-                glowIntensity={0.45}
-                opacity={0.28}
-                gridRotation={0}
-                mouseInteraction
-                mouseInteractionRadius={1}
-                speed={0.35}
+            {/* Balatro Background - contained inside monitor frame */}
+            <div className="balatro-wrapper">
+              <Balatro
+                spinRotation={-5.5}
+                spinSpeed={6}
+                color1="#CE1818"
+                color2="#64AFDB"
+                color3="#050505"
+                contrast={6.5}
+                lighting={0.5}
+                spinAmount={0.2}
+                pixelFilter={2000}
               />
             </div>
+
             <div className="monitor-content">
               <div className="scanlines"></div>
               <div className="top-technical-header">
@@ -155,11 +85,45 @@ const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ instruction }, ref) 
                 <span className="project">PROJECT_001</span>
               </div>
               
-              {renderInstruction()}
+              {/* Progressive guidance with minimal CTA */}
+              <div ref={instructionRef} className={`main-instruction ${isComplete ? 'final-instruction' : ''}`}>
+                <div className="instruction-step">
+                  STEP {stepInfo.step}
+                </div>
+                <div className={`instruction-title ${isComplete ? 'instruction-red' : 'instruction-blue'}`}>
+                  {stepInfo.title}
+                </div>
+                <div className="instruction-subtitle">
+                  {stepInfo.subtitle}
+                </div>
+                
+                <div className="instruction-separator"></div>
 
-              <div className="glow-orb red"></div>
-              <div className="glow-orb blue"></div>
-              
+                <div className="media-play-control">
+                  <span className={`play-bracket ${isPlayReady ? 'ready' : ''}`}>&lt;</span>
+                  <button
+                    className={`minimal-play-btn ${isPlayReady ? 'ready' : ''}`}
+                    onClick={onPlayClick}
+                    disabled={!isPlayReady}
+                    aria-label="Play edit"
+                  >
+                    <svg className="minimal-play-icon" viewBox="0 0 24 24" fill="currentColor">
+                      <polygon points="6,3 20,12 6,21" />
+                    </svg>
+                  </button>
+                  <span className={`play-bracket ${isPlayReady ? 'ready' : ''}`}>&gt;</span>
+                </div>
+
+                <div className="instruction-footer">
+                  {isComplete ? (
+                    <>CLICK THE <span className="play-word">PLAY</span> BUTTON TO CONTINUE</>
+                  ) : (
+                    'AWAITING INPUT'
+                  )}
+                </div>
+
+              </div>
+
             </div>
           </div>
         </div>
@@ -203,16 +167,11 @@ const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ instruction }, ref) 
           overflow: hidden;
         }
 
-        .ripple-grid-wrapper {
+        /* ── BALATRO BACKGROUND ── */
+        .balatro-wrapper {
           position: absolute;
           inset: 0;
           z-index: 0;
-          pointer-events: none;
-        }
-        
-        .ripple-grid-wrapper canvas {
-          width: 100% !important;
-          height: 100% !important;
           pointer-events: none;
         }
 
@@ -251,7 +210,7 @@ const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ instruction }, ref) 
           animation: rec-pulse 2s infinite;
         }
         
-        /* ── INSTRUCTION TYPOGRAPHY ── */
+        /* ── INSTRUCTION TYPOGRAPHY & CARD ── */
         .main-instruction {
           position: relative;
           z-index: 20;
@@ -260,110 +219,143 @@ const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ instruction }, ref) 
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 6px;
-          background: rgba(5, 5, 5, 0.45);
-          border: 1px solid rgba(255, 255, 255, 0.10);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-          padding: 24px 32px;
+          width: 340px;
+          
+          /* Premium glass material */
+          background: linear-gradient(135deg, rgba(20, 20, 22, 0.75) 0%, rgba(10, 10, 12, 0.85) 100%);
+          backdrop-filter: blur(24px);
+          -webkit-backdrop-filter: blur(24px);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          box-shadow: 
+            inset 0 1px 0 rgba(255, 255, 255, 0.15),
+            0 16px 40px rgba(0, 0, 0, 0.5);
+          
+          padding: 36px 36px 28px 36px;
           border-radius: 8px;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
-        
-        .instruction-prefix {
-          font-family: var(--font-mono, monospace);
-          font-size: 11px;
-          font-weight: 600;
-          letter-spacing: 0.25em;
-          color: rgba(100, 175, 219, 0.8);
-          margin-bottom: 8px;
         }
 
-        .instruction-meta {
+        .instruction-step {
+          font-family: var(--font-mono, monospace);
+          font-size: 10px;
+          font-weight: 600;
+          letter-spacing: 0.3em;
+          color: rgba(100, 175, 219, 0.8);
+          margin-bottom: 12px;
+        }
+
+        .instruction-title {
+          font-size: clamp(1rem, 2.5vw, 1.4rem);
+          font-weight: 800;
+          letter-spacing: 0.12em;
+          line-height: 1.1;
+          margin-bottom: 6px;
+        }
+
+        .instruction-subtitle {
+          font-family: var(--font-mono, monospace);
+          font-size: 10px;
+          letter-spacing: 0.15em;
+          color: rgba(255, 255, 255, 0.45);
+          text-transform: none;
+        }
+
+        .instruction-separator {
+          width: 100%;
+          height: 1px;
+          background: rgba(255, 255, 255, 0.06);
+          margin: 24px 0 20px 0;
+        }
+
+        /* ── MINIMAL PLAY CONTROL ── */
+        .media-play-control {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 16px;
+        }
+        
+        .play-bracket {
+          font-family: var(--font-mono, monospace);
+          font-size: 16px;
+          font-weight: 300;
+          color: rgba(255, 255, 255, 0.15);
+          transition: color 0.4s ease;
+        }
+
+        .play-bracket.ready {
+          color: rgba(255, 255, 255, 0.4);
+        }
+
+        .minimal-play-btn {
+          background: transparent;
+          border: none;
+          padding: 10px;
+          color: rgba(255, 255, 255, 0.15);
+          cursor: not-allowed;
+          transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .minimal-play-icon {
+          width: 14px;
+          height: 14px;
+        }
+
+        .minimal-play-btn.ready {
+          cursor: pointer;
+          color: var(--dante, #CE1818);
+          filter: drop-shadow(0 0 8px rgba(206, 24, 24, 0.3));
+        }
+
+        .minimal-play-btn.ready:hover {
+          color: #ff3333;
+          filter: drop-shadow(0 0 12px rgba(206, 24, 24, 0.6));
+          transform: scale(1.15);
+        }
+
+        .minimal-play-btn.ready:active {
+          transform: scale(0.95);
+        }
+
+        /* ── INSTRUCTION FOOTER ── */
+        .instruction-footer {
+          width: 100%;
+          text-align: center;
+          margin-top: 20px;
+          padding-top: 16px;
+          border-top: 1px solid rgba(255, 255, 255, 0.05);
           font-family: var(--font-mono, monospace);
           font-size: 9px;
           font-weight: 500;
-          letter-spacing: 0.2em;
-          color: rgba(255, 255, 255, 0.2);
-          margin-top: 12px;
-          border-top: 1px solid rgba(255,255,255,0.08);
-          padding-top: 10px;
-        }
-        
-        .instruction-normal {
-          font-size: 1.5rem;
-          font-weight: 800;
           letter-spacing: 0.15em;
-          line-height: 1.1;
+          color: rgba(255, 255, 255, 0.35);
         }
         
-        .instruction-huge {
-          font-size: 2.8rem;
-          font-weight: 800;
-          letter-spacing: 0.1em;
-          line-height: 1.1;
-          animation: instruction-breathe 3s ease-in-out infinite;
-        }
-        
-        .instruction-sub {
-          font-size: 1rem;
-          font-weight: 700;
-          letter-spacing: 0.15em;
-          opacity: 0.9;
-          margin-top: 6px;
-        }
-
-        .instruction-muted {
-          color: rgba(255, 255, 255, 0.6);
-        }
-
-        /* PLAY word emphasis */
         .play-word {
           color: var(--dante, #CE1818);
           font-weight: 800;
           letter-spacing: 0.15em;
-          text-shadow: 0 0 16px rgba(206, 24, 24, 0.5);
-          margin: 0 8px;
+          text-shadow: 0 0 8px rgba(206, 24, 24, 0.4);
+          margin: 0 4px;
         }
 
-        @keyframes instruction-breathe {
-          0%, 100% { text-shadow: 0 0 20px rgba(206,24,24,0.3); }
-          50% { text-shadow: 0 0 40px rgba(206,24,24,0.6); }
-        }
-        
         /* Deterministic state colors */
         .instruction-blue {
           color: var(--text, #ffffff);
-          text-shadow: 0 0 12px rgba(100,175,219,0.5);
+          text-shadow: 0 0 12px rgba(100,175,219,0.3);
         }
         
         .instruction-red {
           color: var(--text, #ffffff);
-          text-shadow: 0 0 16px rgba(206,24,24,0.5);
+          text-shadow: 0 0 16px rgba(206,24,24,0.4);
+          animation: instruction-breathe 3s ease-in-out infinite;
         }
-        
-        /* ── GLOW ORBS ── */
-        .glow-orb {
-          position: absolute;
-          border-radius: 50%;
-          filter: blur(60px);
-          pointer-events: none;
-          z-index: 1;
-          will-change: transform, opacity;
-        }
-        .glow-orb.red {
-          width: 400px;
-          height: 400px;
-          background: radial-gradient(circle, rgba(206,24,24,0.15) 0%, rgba(206,24,24,0) 70%);
-          bottom: -100px;
-          right: -100px;
-        }
-        .glow-orb.blue {
-          width: 500px;
-          height: 500px;
-          background: radial-gradient(circle, rgba(100,175,219,0.12) 0%, rgba(100,175,219,0) 70%);
-          top: -150px;
-          left: -150px;
+
+        @keyframes instruction-breathe {
+          0%, 100% { text-shadow: 0 0 16px rgba(206,24,24,0.2); }
+          50% { text-shadow: 0 0 32px rgba(206,24,24,0.5); }
         }
 
         .scanlines {
@@ -373,8 +365,8 @@ const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ instruction }, ref) 
             to bottom,
             rgba(255,255,255,0),
             rgba(255,255,255,0) 50%,
-            rgba(0,0,0,0.1) 50%,
-            rgba(0,0,0,0.1)
+            rgba(0,0,0,0.08) 50%,
+            rgba(0,0,0,0.08)
           );
           background-size: 100% 4px;
           pointer-events: none;
@@ -385,6 +377,17 @@ const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ instruction }, ref) 
           0% { opacity: 1; transform: scale(1); }
           50% { opacity: 0.3; transform: scale(0.9); }
           100% { opacity: 1; transform: scale(1); }
+        }
+
+        @media (max-width: 768px) {
+          .preview-monitor { padding: 8px; }
+          .monitor-placeholder { padding: 4px; }
+          .main-instruction { 
+            width: 280px;
+            padding: 24px 20px 20px 20px; 
+          }
+          .instruction-title { font-size: 1.1rem; }
+          .top-technical-header { font-size: 8px; top: 8px; left: 10px; gap: 6px; }
         }
       `}</style>
     </div>

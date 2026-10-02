@@ -1,14 +1,13 @@
-import { forwardRef, MouseEvent } from 'react';
+import { forwardRef } from 'react';
 import { Clip, ProjectConfig, EditPhase } from '../../data/project';
 
 export interface InspectorProps {
   phase?: EditPhase | string;
   project?: ProjectConfig;
   activeClip?: Clip;
-  onPlayClick?: (e: MouseEvent<HTMLButtonElement>) => void;
 }
 
-const Inspector = forwardRef<HTMLDivElement, InspectorProps>(({ phase, project, activeClip, onPlayClick }, ref) => {
+const Inspector = forwardRef<HTMLDivElement, InspectorProps>(({ phase, project, activeClip }, ref) => {
   return (
     <div ref={ref} className="inspector">
       <div className="header">INSPECTOR</div>
@@ -81,16 +80,6 @@ const Inspector = forwardRef<HTMLDivElement, InspectorProps>(({ phase, project, 
         </div>
       )}
 
-      <div className="inspector-footer">
-        <button 
-          className="inspector-play-btn" 
-          data-state="not-ready"
-          onClick={onPlayClick}
-        >
-          PLAY
-        </button>
-      </div>
-
       <style>{`
         .inspector {
           background: rgba(10, 10, 10, 0.35);
@@ -150,69 +139,10 @@ const Inspector = forwardRef<HTMLDivElement, InspectorProps>(({ phase, project, 
           color: var(--dante, #CE1818);
           text-shadow: 0 0 8px rgba(206,24,24,0.4);
         }
-        
-        .inspector-footer {
-          margin-top: auto;
-          padding-top: 24px;
-          display: flex;
-          justify-content: center;
-        }
 
-        .inspector-play-btn {
-          width: 100%;
-          padding: 12px 24px;
-          background: transparent;
-          border: 1px solid var(--border, rgba(255,255,255,0.10));
-          color: var(--muted, #707070);
-          font-family: monospace;
-          font-size: 14px;
-          letter-spacing: 0.2em;
-          cursor: pointer;
-          transition: all 0.3s ease;
-        }
-
-        .inspector-play-btn[data-state="ready"] {
-          border-color: var(--dante, #CE1818);
-          color: var(--text, #f2f2f2);
-          background: rgba(206, 24, 24, 0.1);
-          box-shadow: 0 0 16px rgba(206, 24, 24, 0.2);
-          animation: play-pulse 2.5s ease-in-out infinite;
-        }
-
-        .inspector-play-btn[data-state="ready"]:hover {
-          background: rgba(206, 24, 24, 0.2);
-          box-shadow: 0 0 28px rgba(206, 24, 24, 0.5);
-          animation: none;
-        }
-
-        @keyframes play-pulse {
-          0%, 100% {
-            box-shadow: 0 0 16px rgba(206, 24, 24, 0.2);
-            border-color: rgba(206, 24, 24, 0.6);
-          }
-          50% {
-            box-shadow: 0 0 28px rgba(206, 24, 24, 0.4), 0 0 4px rgba(206, 24, 24, 0.15) inset;
-            border-color: rgba(206, 24, 24, 1);
-          }
-        }
-        
         @media (max-width: 768px) {
           .inspector {
-            padding: 12px 24px;
-            justify-content: center;
-            border-left: none;
-          }
-          .header, .section {
             display: none;
-          }
-          .inspector-footer {
-            margin-top: 0;
-            padding-top: 0;
-            width: 100%;
-          }
-          .inspector-play-btn {
-            padding: 12px;
-            font-size: 16px;
           }
         }
       `}</style>
