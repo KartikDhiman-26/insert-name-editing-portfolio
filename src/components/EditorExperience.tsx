@@ -29,6 +29,7 @@ export default function EditorExperience({ onTransitionStart, isTransitioning, o
   const [cursorState, setCursorState] = useState<string>('default'); // 'default', 'hover', 'reject'
   const [instruction, setInstruction] = useState<string>('SELECT THE CLIPS');
   const [isPlayReady, setIsPlayReady] = useState<boolean>(false);
+  const [editProgress, setEditProgress] = useState<number>(0);
 
   const handleClipClick = (clipId: string) => {
     setClips((prevClips: Clip[]) => {
@@ -40,6 +41,7 @@ export default function EditorExperience({ onTransitionStart, isTransitioning, o
         setCursorState(clip.keep ? 'reject' : 'hover');
       }
       setInstruction('ADD TO TIMELINE');
+      setEditProgress(15);
       return updatedClips;
     });
   };
@@ -159,6 +161,9 @@ export default function EditorExperience({ onTransitionStart, isTransitioning, o
             if (pct === 0) setInstruction('SCROLL TO CONTINUE');
             else if (pct > 0 && pct < 100) setInstruction('FINALIZING EDIT');
             else if (pct === 100) setInstruction('EDIT COMPLETE\nCLICK PLAY TO VIEW');
+            
+            // Map timeline progress (0-100) to the remaining 15-100% of the bar
+            setEditProgress(15 + Math.floor(self.progress * 85));
           }
         },
       });
@@ -300,6 +305,7 @@ export default function EditorExperience({ onTransitionStart, isTransitioning, o
         onPlayClick={handlePlayClick}
         instruction={instruction}
         isPlayReady={isPlayReady}
+        editProgress={editProgress}
       />
 
           {/* Scroll Indicator */}

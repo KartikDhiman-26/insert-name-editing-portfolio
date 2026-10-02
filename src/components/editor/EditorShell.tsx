@@ -16,9 +16,10 @@ export interface EditorShellProps {
   onPlayClick?: (e: MouseEvent<HTMLButtonElement>) => void;
   instruction?: string;
   isPlayReady?: boolean;
+  editProgress?: number;
 }
 
-const EditorShell = forwardRef<HTMLDivElement, EditorShellProps>(({ phase, clips = CLIPS, onClipClick, onClipEnter, onClipLeave, onPlayClick, instruction, isPlayReady = false }, ref) => {
+const EditorShell = forwardRef<HTMLDivElement, EditorShellProps>(({ phase, clips = CLIPS, onClipClick, onClipEnter, onClipLeave, onPlayClick, instruction, isPlayReady = false, editProgress = 0 }, ref) => {
   const keptClips = clips.filter(c => c.keep);
   
   return (
@@ -35,7 +36,7 @@ const EditorShell = forwardRef<HTMLDivElement, EditorShellProps>(({ phase, clips
         />
       </div>
       <div className="panel-preview">
-        <Preview phase={phase} instruction={instruction} onPlayClick={onPlayClick} isPlayReady={isPlayReady} />
+        <Preview phase={phase} instruction={instruction} onPlayClick={onPlayClick} isPlayReady={isPlayReady} editProgress={editProgress} />
       </div>
       <div className="panel-inspector">
         <Inspector phase={phase} project={PROJECT} activeClip={keptClips[0]} />

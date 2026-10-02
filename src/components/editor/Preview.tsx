@@ -9,9 +9,10 @@ export interface PreviewProps {
   instruction?: string;
   onPlayClick?: (e: MouseEvent<HTMLButtonElement>) => void;
   isPlayReady?: boolean;
+  editProgress?: number;
 }
 
-const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ instruction, onPlayClick, isPlayReady = false }, ref) => {
+const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ instruction, onPlayClick, isPlayReady = false, editProgress = 0 }, ref) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const instructionRef = useRef<HTMLDivElement | null>(null);
   const [displayInstruction, setDisplayInstruction] = useState<string | undefined>(instruction);
@@ -50,19 +51,23 @@ const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ instruction, onPlayC
     return { step: '01', title: displayInstruction, subtitle: '' };
   };
 
-  const getProgressPercentage = () => {
-    if (!displayInstruction) return 0;
-    if (displayInstruction.includes('SELECT')) return 25;
-    if (displayInstruction.includes('ADD TO TIMELINE')) return 50;
-    if (displayInstruction.includes('SCROLL TO CONTINUE')) return 60;
-    if (displayInstruction.includes('FINALIZING')) return 85;
-    if (displayInstruction.includes('COMPLETE')) return 100;
-    return 0;
-  };
-
   const stepInfo = getStepInfo();
   const isComplete = displayInstruction?.includes('COMPLETE') || false;
-  const progressPct = getProgressPercentage();
+  
+  // Dynamic play control styling
+  const getPlayControlStyle = () => {
+    if (isPlayReady) return { transform: 'scale(1)', opacity: 1 };
+    
+    // Scale starts small and grows as progress increases
+    const scale = 0.5 + ((editProgress / 100) * 0.4); // 0.5 to 0.9
+    const opacity = 0.2 + ((editProgress / 100) * 0.5); // 0.2 to 0.7
+    
+    return {
+      transform: `scale(${scale})`,
+      opacity: opacity,
+      transition: 'transform 0.5s ease, opacity 0.5s ease'
+    };
+  };
 
   return (
     <div ref={(node) => {
@@ -110,7 +115,7 @@ const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ instruction, onPlayC
                 
                 <div className="instruction-separator"></div>
 
-                <div className="media-play-control">
+                <div className="media-play-control" style={getPlayControlStyle()}>
                   <span className={`play-bracket ${isPlayReady ? 'ready' : ''}`}>&lt;</span>
                   <button
                     className={`minimal-play-btn ${isPlayReady ? 'ready' : ''}`}
@@ -144,11 +149,11 @@ const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ instruction, onPlayC
           <div className="preview-progress-track">
             <div 
               className="preview-progress-fill" 
-              style={{ width: `${progressPct}%` }}
+              style={{ width: `${editProgress}%` }}
             ></div>
           </div>
           <div className="preview-progress-label">
-            {progressPct}%
+            {editProgress}%
           </div>
         </div>
         
