@@ -50,8 +50,19 @@ const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ instruction, onPlayC
     return { step: '01', title: displayInstruction, subtitle: '' };
   };
 
+  const getProgressPercentage = () => {
+    if (!displayInstruction) return 0;
+    if (displayInstruction.includes('SELECT')) return 25;
+    if (displayInstruction.includes('ADD TO TIMELINE')) return 50;
+    if (displayInstruction.includes('SCROLL TO CONTINUE')) return 60;
+    if (displayInstruction.includes('FINALIZING')) return 85;
+    if (displayInstruction.includes('COMPLETE')) return 100;
+    return 0;
+  };
+
   const stepInfo = getStepInfo();
   const isComplete = displayInstruction?.includes('COMPLETE') || false;
+  const progressPct = getProgressPercentage();
 
   return (
     <div ref={(node) => {
@@ -127,6 +138,20 @@ const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ instruction, onPlayC
             </div>
           </div>
         </div>
+        
+        {/* Progress Strip */}
+        <div className="preview-progress-container">
+          <div className="preview-progress-track">
+            <div 
+              className="preview-progress-fill" 
+              style={{ width: `${progressPct}%` }}
+            ></div>
+          </div>
+          <div className="preview-progress-label">
+            {progressPct}%
+          </div>
+        </div>
+        
       </div>
       <style>{`
         .preview-monitor {
@@ -147,11 +172,12 @@ const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ instruction, onPlayC
         .aspect-wrapper {
           width: 100%;
           max-width: 800px;
-          aspect-ratio: 16/9;
+          display: flex;
+          flex-direction: column;
         }
         .monitor-placeholder {
           width: 100%;
-          height: 100%;
+          aspect-ratio: 16/9;
           background: var(--void, #050505);
           border: 1px solid var(--border, rgba(255,255,255,0.10));
           border-radius: 4px;
@@ -165,6 +191,48 @@ const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ instruction, onPlayC
           position: relative;
           background: #000;
           overflow: hidden;
+        }
+
+        /* ── PROGRESS STRIP ── */
+        .preview-progress-container {
+          width: 100%;
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          margin-top: 20px;
+          padding: 0 4px;
+        }
+
+        .preview-progress-track {
+          flex: 1;
+          height: 4px;
+          background: rgba(0, 0, 0, 0.6);
+          border: 1px solid rgba(255, 255, 255, 0.05);
+          border-radius: 2px;
+          overflow: hidden;
+          position: relative;
+        }
+
+        .preview-progress-fill {
+          height: 100%;
+          background: var(--dante, #CE1818);
+          box-shadow: 0 0 12px rgba(206, 24, 24, 0.8);
+          transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+          border-radius: 2px;
+        }
+
+        .preview-progress-label {
+          font-family: var(--font-mono, monospace);
+          font-size: 10px;
+          color: rgba(255, 255, 255, 0.4);
+          min-width: 36px;
+          text-align: right;
+          letter-spacing: 0.1em;
+          transition: color 0.3s ease;
+        }
+
+        .final-instruction ~ .preview-progress-container .preview-progress-label {
+          color: rgba(255, 255, 255, 0.8);
         }
 
         /* ── BALATRO BACKGROUND ── */
@@ -219,7 +287,7 @@ const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ instruction, onPlayC
           display: flex;
           flex-direction: column;
           align-items: center;
-          width: 340px;
+          width: 360px;
           
           /* Premium glass material */
           background: linear-gradient(135deg, rgba(20, 20, 22, 0.75) 0%, rgba(10, 10, 12, 0.85) 100%);
@@ -271,12 +339,13 @@ const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ instruction, onPlayC
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 16px;
+          gap: 24px;
+          margin: 8px 0;
         }
         
         .play-bracket {
           font-family: var(--font-mono, monospace);
-          font-size: 16px;
+          font-size: 24px;
           font-weight: 300;
           color: rgba(255, 255, 255, 0.15);
           transition: color 0.4s ease;
@@ -289,7 +358,7 @@ const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ instruction, onPlayC
         .minimal-play-btn {
           background: transparent;
           border: none;
-          padding: 10px;
+          padding: 16px;
           color: rgba(255, 255, 255, 0.15);
           cursor: not-allowed;
           transition: all 0.3s ease;
@@ -299,19 +368,38 @@ const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ instruction, onPlayC
         }
 
         .minimal-play-icon {
-          width: 14px;
-          height: 14px;
+          width: 32px;
+          height: 32px;
         }
 
         .minimal-play-btn.ready {
           cursor: pointer;
           color: var(--dante, #CE1818);
-          filter: drop-shadow(0 0 8px rgba(206, 24, 24, 0.3));
+          animation: dante-pulse 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @media (prefers-reduced-motion: reduce) {
+          .minimal-play-btn.ready {
+            animation: none;
+            filter: drop-shadow(0 0 12px rgba(206, 24, 24, 0.6));
+          }
+        }
+
+        @keyframes dante-pulse {
+          0%, 100% {
+            filter: drop-shadow(0 0 12px rgba(206, 24, 24, 0.4));
+            transform: scale(1);
+          }
+          50% {
+            filter: drop-shadow(0 0 28px rgba(206, 24, 24, 0.8));
+            transform: scale(1.08);
+          }
         }
 
         .minimal-play-btn.ready:hover {
           color: #ff3333;
-          filter: drop-shadow(0 0 12px rgba(206, 24, 24, 0.6));
+          animation: none;
+          filter: drop-shadow(0 0 32px rgba(206, 24, 24, 0.9));
           transform: scale(1.15);
         }
 
@@ -323,8 +411,8 @@ const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ instruction, onPlayC
         .instruction-footer {
           width: 100%;
           text-align: center;
-          margin-top: 20px;
-          padding-top: 16px;
+          margin-top: 24px;
+          padding-top: 20px;
           border-top: 1px solid rgba(255, 255, 255, 0.05);
           font-family: var(--font-mono, monospace);
           font-size: 9px;
@@ -388,6 +476,8 @@ const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ instruction, onPlayC
           }
           .instruction-title { font-size: 1.1rem; }
           .top-technical-header { font-size: 8px; top: 8px; left: 10px; gap: 6px; }
+          .minimal-play-icon { width: 24px; height: 24px; }
+          .play-bracket { font-size: 20px; }
         }
       `}</style>
     </div>

@@ -121,25 +121,7 @@ export function createFinishingTimeline(refs: FinishingRefs): gsap.core.Timeline
   
   tl.call(() => { refs.finishLabels?.[0]?.classList.add('active'); });
   
-  if (refs.previewContent) {
-    tl.to(refs.previewContent, {
-      scale: 1.05,
-      duration: 0.5,
-      ease: 'power2.inOut',
-      yoyo: true,
-      repeat: 1,
-    });
-  }
-  
   tl.call(() => { refs.finishLabels?.[1]?.classList.add('active'); }, undefined, "+=0.2");
-  
-  if (refs.previewContent) {
-    tl.to(refs.previewContent, {
-      filter: 'saturate(1.3) contrast(1.15) sepia(0.1)',
-      duration: 0.6,
-      ease: 'power1.inOut',
-    });
-  }
   
   tl.call(() => { refs.finishLabels?.[2]?.classList.add('active'); }, undefined, "+=0.2");
   
