@@ -58,7 +58,7 @@ const EditorShell = forwardRef<HTMLDivElement, EditorShellProps>(({ phase, clips
           overflow: hidden;
           opacity: 0; /* GSAP will reveal */
           display: grid;
-          grid-template-rows: 40px 1fr 240px 44px;
+          grid-template-rows: 40px 1fr 44px 240px;
           grid-template-columns: 280px 1fr 260px;
           color: var(--text, #f2f2f2);
         }
@@ -83,12 +83,12 @@ const EditorShell = forwardRef<HTMLDivElement, EditorShellProps>(({ phase, clips
           grid-row: 2;
         }
         
-        .panel-timeline {
+        .panel-toolbar {
           grid-column: 1 / -1;
           grid-row: 3;
         }
-        
-        .panel-toolbar {
+
+        .panel-timeline {
           grid-column: 1 / -1;
           grid-row: 4;
         }
@@ -98,14 +98,14 @@ const EditorShell = forwardRef<HTMLDivElement, EditorShellProps>(({ phase, clips
             height: 100vh;
             height: 100dvh;
             grid-template-columns: 1fr;
-            grid-template-rows: 40px 120px 1fr 100px 44px;
+            grid-template-rows: 40px 120px 1fr 44px 100px;
           }
           .panel-topbar { grid-column: 1; grid-row: 1; }
           .panel-media { grid-column: 1; grid-row: 2; display: block; }
           .panel-preview { grid-column: 1; grid-row: 3; }
           .panel-inspector { display: none; }
-          .panel-timeline { grid-column: 1; grid-row: 4; }
-          .panel-toolbar { grid-column: 1; grid-row: 5; }
+          .panel-toolbar { grid-column: 1; grid-row: 4; }
+          .panel-timeline { grid-column: 1; grid-row: 5; }
         }
       `}</style>
     </div>

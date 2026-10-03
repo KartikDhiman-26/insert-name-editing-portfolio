@@ -99,7 +99,7 @@ const ContactSection = forwardRef<HTMLElement, ContactSectionProps>((props, ref)
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: 120px 24px;
+          padding: 120px 20px;
           position: relative;
         }
         .contact-glass {
@@ -170,7 +170,7 @@ const ContactSection = forwardRef<HTMLElement, ContactSectionProps>((props, ref)
 
         @media (max-width: 640px) {
           .contact-glass {
-            padding: 40px 24px;
+            padding: 40px 20px;
           }
           .contact-title {
             margin-bottom: 40px;

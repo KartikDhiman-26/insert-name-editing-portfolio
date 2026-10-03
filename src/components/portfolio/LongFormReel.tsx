@@ -11,8 +11,21 @@ export default function LongFormReel({ projects = [] }: LongFormReelProps) {
   const [infoIndex, setInfoIndex] = useState(0); // Track info separately to update mid-transition
   const [isAnimating, setIsAnimating] = useState(false);
   const [isInView, setIsInView] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
+  
   const containerRef = useRef<HTMLDivElement | null>(null);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+
+  // Toggle mute on click
+  const handleVideoClick = (index: number) => {
+    if (index === activeIndex) {
+      const vid = videoRefs.current[index];
+      if (vid) {
+        vid.muted = !vid.muted;
+        setIsMuted(vid.muted);
+      }
+    }
+  };
 
   const animateTransition = useCallback((fromIndex: number, toIndex: number, direction: number) => {
     const ctx = gsap.context(() => {
@@ -129,9 +142,11 @@ export default function LongFormReel({ projects = [] }: LongFormReelProps) {
 
   // Audio/Video logic
   useEffect(() => {
+    setIsMuted(true);
     videoRefs.current.forEach((vid, i) => {
       if (vid) {
-        if (i === activeIndex) {
+        vid.muted = true;
+        if (i === activeIndex && isInView) {
           vid.play().catch(() => {});
         } else {
           vid.pause();
@@ -139,7 +154,7 @@ export default function LongFormReel({ projects = [] }: LongFormReelProps) {
         }
       }
     });
-  }, [activeIndex]);
+  }, [activeIndex, isInView]);
 
 
 
@@ -255,6 +270,8 @@ export default function LongFormReel({ projects = [] }: LongFormReelProps) {
             flex-direction: column;
             width: 100%;
             max-width: 100%;
+            padding: 0 20px;
+            box-sizing: border-box;
           }
           .nav-btn-side {
             padding: 0.5rem;
@@ -511,13 +528,17 @@ export default function LongFormReel({ projects = [] }: LongFormReelProps) {
                   {perforations.map(p => <div key={`l-${p}`} className="hole" />)}
                 </div>
 
-                <div className="video-container" style={{ position: 'relative', zIndex: 2 }}>
+                <div 
+                  className="video-container" 
+                  style={{ position: 'relative', zIndex: 2, cursor: 'pointer' }}
+                  onClick={() => handleVideoClick(index)}
+                >
                   {project.videoUrl ? (
                     <video 
                       ref={(el) => { videoRefs.current[index] = el; }}
                       className="video-element"
                       src={project.videoUrl}
-                      autoPlay
+                      preload="none"
                       muted
                       loop
                       playsInline

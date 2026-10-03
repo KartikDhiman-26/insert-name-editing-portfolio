@@ -32,14 +32,17 @@ export default function Beams({
     window.addEventListener('resize', resize);
     resize();
 
+    const isMobile = window.innerWidth < 768;
+    const actualBeamNumber = isMobile ? Math.min(6, beamNumber) : beamNumber;
+
     // Initialize randomized architectural beams
-    const beams = Array.from({ length: beamNumber }).map(() => ({
+    const beams = Array.from({ length: actualBeamNumber }).map(() => ({
       x: Math.random() * window.innerWidth,
       y: Math.random() * window.innerHeight * 2 - window.innerHeight,
       // Base dimensions off props
       length: (Math.random() * 0.5 + 0.5) * beamHeight * scale * 500,
       width: (Math.random() * 0.5 + 0.5) * beamWidth * scale * 50,
-      speed: (Math.random() * 0.5 + 0.5) * speed * 1.5,
+      speed: (Math.random() * 0.5 + 0.5) * speed * (isMobile ? 1.0 : 1.5),
       opacity: Math.random() * 0.4 + 0.1, // deep, restrained opacity
       phase: Math.random() * Math.PI * 2
     }));
@@ -77,8 +80,10 @@ export default function Beams({
         gradient.addColorStop(0.5, `rgba(${rgbStr}, ${currentOpacity})`);
         gradient.addColorStop(1, `rgba(${rgbStr}, 0)`);
 
-        ctx.shadowColor = `rgba(${rgbStr}, 0.6)`;
-        ctx.shadowBlur = 60 * scale;
+        if (!isMobile) {
+          ctx.shadowColor = `rgba(${rgbStr}, 0.6)`;
+          ctx.shadowBlur = 60 * scale;
+        }
         ctx.fillStyle = gradient;
         
         ctx.beginPath();
@@ -115,6 +120,7 @@ export default function Beams({
       />
       {noiseIntensity > 0 && (
         <div 
+          className="beams-noise"
           style={{
             position: 'absolute',
             inset: 0,
@@ -124,6 +130,11 @@ export default function Beams({
           }}
         />
       )}
+      <style>{`
+        @media (max-width: 768px) {
+          .beams-noise { display: none !important; }
+        }
+      `}</style>
     </>
   );
 }

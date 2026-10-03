@@ -144,18 +144,6 @@ const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ instruction, onPlayC
           </div>
         </div>
         
-        {/* Progress Strip */}
-        <div className="preview-progress-container">
-          <div className="preview-progress-track">
-            <div 
-              className="preview-progress-fill" 
-              style={{ width: `${editProgress}%` }}
-            ></div>
-          </div>
-          <div className="preview-progress-label">
-            {editProgress}%
-          </div>
-        </div>
         
       </div>
       <style>{`
@@ -196,48 +184,6 @@ const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ instruction, onPlayC
           position: relative;
           background: #000;
           overflow: hidden;
-        }
-
-        /* ── PROGRESS STRIP ── */
-        .preview-progress-container {
-          width: 100%;
-          display: flex;
-          align-items: center;
-          gap: 16px;
-          margin-top: 20px;
-          padding: 0 4px;
-        }
-
-        .preview-progress-track {
-          flex: 1;
-          height: 4px;
-          background: rgba(0, 0, 0, 0.6);
-          border: 1px solid rgba(255, 255, 255, 0.05);
-          border-radius: 2px;
-          overflow: hidden;
-          position: relative;
-        }
-
-        .preview-progress-fill {
-          height: 100%;
-          background: var(--dante, #CE1818);
-          box-shadow: 0 0 12px rgba(206, 24, 24, 0.8);
-          transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-          border-radius: 2px;
-        }
-
-        .preview-progress-label {
-          font-family: var(--font-mono, monospace);
-          font-size: 10px;
-          color: rgba(255, 255, 255, 0.4);
-          min-width: 36px;
-          text-align: right;
-          letter-spacing: 0.1em;
-          transition: color 0.3s ease;
-        }
-
-        .final-instruction ~ .preview-progress-container .preview-progress-label {
-          color: rgba(255, 255, 255, 0.8);
         }
 
         /* ── BALATRO BACKGROUND ── */
@@ -292,12 +238,13 @@ const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ instruction, onPlayC
           display: flex;
           flex-direction: column;
           align-items: center;
-          width: 360px;
+          width: 100%;
+          max-width: 520px;
           
-          /* Premium glass material */
-          background: linear-gradient(135deg, rgba(20, 20, 22, 0.75) 0%, rgba(10, 10, 12, 0.85) 100%);
-          backdrop-filter: blur(24px);
-          -webkit-backdrop-filter: blur(24px);
+          /* More transparent Premium glass */
+          background: linear-gradient(135deg, rgba(20, 20, 22, 0.45) 0%, rgba(10, 10, 12, 0.6) 100%);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
           border: 1px solid rgba(255, 255, 255, 0.08);
           box-shadow: 
             inset 0 1px 0 rgba(255, 255, 255, 0.15),
@@ -344,13 +291,13 @@ const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ instruction, onPlayC
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 24px;
-          margin: 8px 0;
+          gap: 16px;
+          margin: 4px 0;
         }
         
         .play-bracket {
           font-family: var(--font-mono, monospace);
-          font-size: 24px;
+          font-size: 16px;
           font-weight: 300;
           color: rgba(255, 255, 255, 0.15);
           transition: color 0.4s ease;
@@ -363,7 +310,7 @@ const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ instruction, onPlayC
         .minimal-play-btn {
           background: transparent;
           border: none;
-          padding: 16px;
+          padding: 10px;
           color: rgba(255, 255, 255, 0.15);
           cursor: not-allowed;
           transition: all 0.3s ease;
@@ -373,8 +320,8 @@ const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ instruction, onPlayC
         }
 
         .minimal-play-icon {
-          width: 32px;
-          height: 32px;
+          width: 20px;
+          height: 20px;
         }
 
         .minimal-play-btn.ready {
@@ -386,18 +333,18 @@ const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ instruction, onPlayC
         @media (prefers-reduced-motion: reduce) {
           .minimal-play-btn.ready {
             animation: none;
-            filter: drop-shadow(0 0 12px rgba(206, 24, 24, 0.6));
+            filter: drop-shadow(0 0 8px rgba(206, 24, 24, 0.6));
           }
         }
 
         @keyframes dante-pulse {
           0%, 100% {
-            filter: drop-shadow(0 0 12px rgba(206, 24, 24, 0.4));
+            filter: drop-shadow(0 0 6px rgba(206, 24, 24, 0.4));
             transform: scale(1);
           }
           50% {
-            filter: drop-shadow(0 0 28px rgba(206, 24, 24, 0.8));
-            transform: scale(1.08);
+            filter: drop-shadow(0 0 16px rgba(206, 24, 24, 0.7));
+            transform: scale(1.05);
           }
         }
 
@@ -476,13 +423,12 @@ const Preview = forwardRef<HTMLDivElement, PreviewProps>(({ instruction, onPlayC
           .preview-monitor { padding: 8px; }
           .monitor-placeholder { padding: 4px; }
           .main-instruction { 
-            width: 280px;
+            width: 100%;
+            max-width: 320px;
             padding: 24px 20px 20px 20px; 
           }
           .instruction-title { font-size: 1.1rem; }
           .top-technical-header { font-size: 8px; top: 8px; left: 10px; gap: 6px; }
-          .minimal-play-icon { width: 24px; height: 24px; }
-          .play-bracket { font-size: 20px; }
         }
       `}</style>
     </div>

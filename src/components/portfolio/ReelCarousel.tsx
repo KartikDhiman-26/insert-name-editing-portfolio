@@ -166,8 +166,8 @@ export default function ReelCarousel({ projects = [] }: ReelCarouselProps) {
     videoRefs.current.forEach((vid, i) => {
       if (vid) {
         vid.muted = true;
-        if (i === activeIndex) {
-          vid.play().catch(() => {}); // handle autoplay policies
+        if (i === activeIndex && isInView) {
+          vid.play().catch(() => {}); // handle preload="none" policies
         } else {
           vid.pause();
           vid.currentTime = 0;
@@ -189,7 +189,7 @@ export default function ReelCarousel({ projects = [] }: ReelCarouselProps) {
         { y: 0, opacity: 1, duration: 0.45, ease: 'power2.out', delay: 0.15 }
       );
     }
-  }, [activeIndex, positionCards]);
+  }, [activeIndex, positionCards, isInView]);
 
   const handleCardClick = (index: number) => {
     if (index === activeIndex) {
@@ -232,7 +232,7 @@ export default function ReelCarousel({ projects = [] }: ReelCarouselProps) {
                     <video
                       ref={(el) => { videoRefs.current[i] = el; }}
                       src={proj.videoUrl}
-                      autoPlay
+                      preload="none"
                       loop
                       muted
                       playsInline
@@ -540,7 +540,7 @@ export default function ReelCarousel({ projects = [] }: ReelCarouselProps) {
           .rc-root {
             grid-template-columns: 1fr;
             gap: 28px;
-            padding: 0 24px;
+            padding: 0 20px;
           }
           .rc-title-area {
             flex-direction: row;

@@ -158,16 +158,16 @@ const AboutSection = forwardRef<HTMLElement, AboutSectionProps>((props, ref) => 
 
         @media (max-width: 640px) {
           .about-section {
-            padding: 80px 16px;
+            padding: 80px 20px;
           }
           .about-glass {
-            padding: 40px 24px;
+            padding: 40px 20px;
           }
           .about-strip {
             flex-wrap: wrap;
             justify-content: center;
             gap: 8px;
-            padding: 12px 16px;
+            padding: 12px 20px;
           }
           .strip-item {
             font-size: 10px;
